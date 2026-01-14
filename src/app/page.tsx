@@ -20,14 +20,25 @@ export default function Home() {
   const handleDragEnd = (event: any, info: any) => {
     if (!skullRef.current) return;
     const skullRect = skullRef.current.getBoundingClientRect();
-    const dropX = info.point.x;
-    const dropY = info.point.y;
+    
+    // Use clientX/Y from the event for viewport-relative coordinates
+    // Framer Motion passes the original event object
+    let clientX, clientY;
+    
+    // Handle both mouse and touch events
+    if (event.changedTouches && event.changedTouches.length > 0) {
+      clientX = event.changedTouches[0].clientX;
+      clientY = event.changedTouches[0].clientY;
+    } else {
+      clientX = event.clientX;
+      clientY = event.clientY;
+    }
 
     if (
-      dropX >= skullRect.left &&
-      dropX <= skullRect.right &&
-      dropY >= skullRect.top &&
-      dropY <= skullRect.bottom
+      clientX >= skullRect.left &&
+      clientX <= skullRect.right &&
+      clientY >= skullRect.top &&
+      clientY <= skullRect.bottom
     ) {
       setShowReward(true);
       confetti({
@@ -1357,6 +1368,13 @@ export default function Home() {
               exit={{ opacity: 0, scale: 0.5 }}
               className="bg-black border-2 border-clash-rust p-8 max-w-md w-full text-center relative overflow-hidden"
             >
+              <button 
+                onClick={() => setShowReward(false)}
+                className="absolute top-4 right-4 text-clash-rust/50 hover:text-clash-rust transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-clash-rust to-transparent animate-scanline" />
               
               <Trophy className="w-16 h-16 text-clash-rust mx-auto mb-6 animate-bounce" />
