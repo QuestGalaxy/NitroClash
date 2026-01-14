@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .clash-card {
+    @apply relative overflow-hidden rounded-none border border-clash-metal bg-clash-black/80 backdrop-blur-sm transition-all duration-300;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .clash-card::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-br from-clash-rust/10 to-transparent pointer-events-none;
+  }
+
+  .clash-button {
+    @apply relative px-8 py-3 bg-clash-rust text-white font-bold uppercase tracking-widest transition-all duration-300 hover:bg-clash-sand hover:scale-105 active:scale-95;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+  }
+
+  .text-glitch {
+    text-shadow: 2px 0 #4ade80, -2px 0 #b45309;
+  }
+
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% - 1rem)); }
+  }
+
+  .animate-scroll {
+    animation: scroll 40s linear infinite;
+  }
+}
