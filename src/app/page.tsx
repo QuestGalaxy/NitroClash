@@ -35,9 +35,9 @@ export default function Home() {
     } catch (e) {
       // AudioContext might be blocked or unsupported
       // If synthesis fails, try loading the file as a last resort
-      const audio = new Audio(type === 'hover' ? '/audio/hover.mp3' : '/audio/click.mp3');
-      audio.volume = 0.15;
-      audio.play().catch(() => {});
+      // const audio = new Audio(type === 'hover' ? '/audio/hover.mp3' : '/audio/click.mp3');
+      // audio.volume = 0.15;
+      // audio.play().catch(() => {});
     }
   };
 
@@ -45,6 +45,9 @@ export default function Home() {
     if (videoRef.current) {
       const newMuted = !isAudioMuted;
       videoRef.current.muted = newMuted;
+      if (!newMuted) {
+        videoRef.current.volume = 0.2;
+      }
       setIsAudioMuted(newMuted);
       playSfx('click');
     }
