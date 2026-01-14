@@ -1,10 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Trophy, Zap, Shield, Rocket, ChevronRight, ExternalLink, Twitter, Send, Instagram, ShoppingBag, Target, Activity, Cpu, Terminal, Crosshair, Menu, X, Coins, TrendingUp, Flame, Dna, Volume2, VolumeX } from "lucide-react";
+import { Trophy, Zap, Shield, Rocket, ChevronRight, ExternalLink, Twitter, Send, Instagram, ShoppingBag, Target, Activity, Cpu, Terminal, Crosshair, Menu, X, Coins, TrendingUp, Flame, Dna, Volume2, VolumeX, Skull } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
+import confetti from "canvas-confetti";
 import { useState, useEffect, useRef } from "react";
 
 export default function Home() {
@@ -12,6 +13,33 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAudioMuted, setIsAudioMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [showReward, setShowReward] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const skullRef = useRef<HTMLAnchorElement>(null);
+
+  const handleDragEnd = (event: any, info: any) => {
+    if (!skullRef.current) return;
+    const skullRect = skullRef.current.getBoundingClientRect();
+    const dropX = info.point.x;
+    const dropY = info.point.y;
+
+    if (
+      dropX >= skullRect.left &&
+      dropX <= skullRect.right &&
+      dropY >= skullRect.top &&
+      dropY <= skullRect.bottom
+    ) {
+      setShowReward(true);
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.5 },
+        zIndex: 1000,
+        colors: ['#B45309', '#FDE047', '#ffffff'] // Rust, Neon, White
+      });
+      playSfx('click');
+    }
+  };
   
   // Audio SFX Logic
   const playSfx = (type: 'hover' | 'click') => {
@@ -158,23 +186,39 @@ export default function Home() {
       
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-[100] px-6 py-4 backdrop-blur-none md:backdrop-blur-md border-b border-clash-rust/20 bg-black/20 md:bg-black/20 transition-all duration-300">
-        <div className="container mx-auto flex justify-between items-center">
-          <a href="#" className="flex items-center gap-2 md:gap-4 group">
+        <div className="container mx-auto flex justify-between items-center relative">
+          {/* Ghost element to maintain layout spacing */}
+          <div className="flex items-center gap-2 md:gap-4 opacity-0 pointer-events-none select-none" aria-hidden="true">
             <div className="relative w-10 h-10 md:w-14 md:h-14 flex items-center">
+              <div className="w-full h-full" />
+            </div>
+            <span className="hidden md:block text-xl md:text-2xl font-black uppercase tracking-tighter">
+              NitroClash
+            </span>
+          </div>
+
+          <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-2 md:gap-4 group z-[200]">
+            <motion.div 
+              className="relative w-20 h-20 md:w-32 md:h-32 flex items-center cursor-move"
+              drag
+              onDragEnd={handleDragEnd}
+              whileDrag={{ scale: 1.1, cursor: "grabbing" }}
+              dragElastic={0.1}
+            >
               <video
                 autoPlay
                 muted
                 loop
                 playsInline
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(180,83,9,0.5)] pointer-events-none"
               >
                 <source src="/img/logo.webm" type="video/webm" />
               </video>
-            </div>
-            <span className="hidden md:block text-xl md:text-2xl font-black text-white uppercase tracking-tighter group-hover:text-clash-rust transition-colors">
+            </motion.div>
+            <span className="hidden md:block text-2xl md:text-4xl font-black text-white uppercase tracking-tighter group-hover:text-clash-rust transition-colors drop-shadow-md">
               NitroClash
             </span>
-          </a>
+          </div>
           
           <div className="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-[0.2em]">
             <a href="#roadmap" onMouseEnter={() => playSfx('hover')} onClick={() => playSfx('click')} className="hover:text-clash-rust transition-colors">Roadmap</a>
@@ -195,6 +239,7 @@ export default function Home() {
             <div className="hidden sm:flex items-center gap-4">
               <a href={TWITTER_URL} onMouseEnter={() => playSfx('hover')} onClick={() => playSfx('click')} target="_blank" className="p-2 hover:text-clash-rust transition-colors"><Twitter className="w-4 h-4" /></a>
               <a href={TELEGRAM_URL} onMouseEnter={() => playSfx('hover')} onClick={() => playSfx('click')} target="_blank" className="p-2 hover:text-clash-rust transition-colors"><Send className="w-4 h-4" /></a>
+              <a href={INSTAGRAM_URL} onMouseEnter={() => playSfx('hover')} onClick={() => playSfx('click')} target="_blank" className="p-2 hover:text-clash-rust transition-colors"><Instagram className="w-4 h-4" /></a>
             </div>
             
             <div id="questlayer-widget-0ccaefb9-cd1b-4858-82cb-89d48e553f01"></div>
@@ -427,6 +472,37 @@ export default function Home() {
                   onClick={() => playSfx('click')}
                 >
                   <Instagram className="w-5 h-5 text-clash-rust group-hover:scale-110 transition-transform" />
+                </a>
+                <a 
+                  ref={skullRef}
+                  href="#" 
+                  className="p-3 border border-clash-rust/20 bg-clash-rust/5 hover:bg-clash-rust/20 hover:border-clash-rust/50 transition-all group relative overflow-visible"
+                  onMouseEnter={() => playSfx('hover')}
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    playSfx('click');
+                    setShowHint(true);
+                    setTimeout(() => setShowHint(false), 3000);
+                  }}
+                >
+                  <div className="absolute inset-0 bg-clash-rust/10 animate-pulse overflow-hidden" />
+                  <Skull className="w-5 h-5 text-clash-rust group-hover:scale-110 transition-transform relative z-10" />
+                  
+                  <AnimatePresence>
+                    {showHint && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                        className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-black border border-clash-rust px-3 py-2 z-50"
+                      >
+                        <div className="text-[10px] font-mono text-clash-rust uppercase tracking-wider">
+                          You need a special key...
+                        </div>
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-4 border-transparent border-t-clash-rust" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </a>
               </div>
             </motion.div>
@@ -1270,6 +1346,48 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Reward Modal */}
+      <AnimatePresence>
+        {showReward && (
+          <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              className="bg-black border-2 border-clash-rust p-8 max-w-md w-full text-center relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-clash-rust to-transparent animate-scanline" />
+              
+              <Trophy className="w-16 h-16 text-clash-rust mx-auto mb-6 animate-bounce" />
+              
+              <h3 className="text-3xl font-black italic uppercase mb-4 text-white">
+                GhostAlien <span className="text-clash-rust">Access!</span>
+              </h3>
+              
+              <div className="text-clash-sand/80 font-mono text-sm mb-6 uppercase tracking-widest leading-relaxed">
+                <p className="mb-4">You found the easter egg! Here is your exclusive invite code to GhostAlien:</p>
+                <div className="bg-clash-rust/10 border border-clash-rust/30 p-4 mb-2 select-all">
+                  <code className="text-xl font-black text-clash-rust">REF-RZLENSDB</code>
+                </div>
+                <p className="text-[10px] text-clash-rust animate-pulse">Only 20 invites available</p>
+              </div>
+              
+              <a 
+                href="https://ghostalien.questgalaxy.com/?ref=REF-RZLENSDB"
+                target="_blank"
+                onClick={() => {
+                  playSfx('click');
+                  setShowReward(false);
+                }}
+                className="block w-full py-4 bg-clash-rust text-black font-black uppercase tracking-widest hover:bg-white transition-colors"
+              >
+                Enter The Portal
+              </a>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
