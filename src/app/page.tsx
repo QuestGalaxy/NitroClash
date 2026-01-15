@@ -15,7 +15,20 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showReward, setShowReward] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [showLogoHint, setShowLogoHint] = useState(false);
   const skullRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    // Show "Join the Clan" hint occasionally
+    const hintInterval = setInterval(() => {
+      if (Math.random() > 0.3) { // 70% chance every 5 seconds
+        setShowLogoHint(true);
+        setTimeout(() => setShowLogoHint(false), 3000);
+      }
+    }, 5000);
+
+    return () => clearInterval(hintInterval);
+  }, []);
 
   const handleDragEnd = (event: any, info: any) => {
     if (!skullRef.current) return;
@@ -225,6 +238,22 @@ export default function Home() {
               >
                 <source src="/img/logo.webm" type="video/webm" />
               </video>
+
+              <AnimatePresence>
+                {showLogoHint && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: -10 }}
+                    className="absolute top-full left-1/2 -translate-x-1/4 mt-2 whitespace-nowrap bg-black border border-clash-rust px-3 py-2 z-50 pointer-events-none"
+                  >
+                    <div className="text-[10px] font-mono text-clash-rust uppercase tracking-wider">
+                      Join the Clan
+                    </div>
+                    <div className="absolute bottom-full left-4 -mb-[1px] border-4 border-transparent border-b-clash-rust" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
             <span className="hidden md:block text-2xl md:text-4xl font-black text-white uppercase tracking-tighter group-hover:text-clash-rust transition-colors drop-shadow-md">
               NitroClash
@@ -505,12 +534,12 @@ export default function Home() {
                         initial={{ opacity: 0, y: 10, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                        className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-black border border-clash-rust px-3 py-2 z-50"
+                        className="absolute bottom-full mb-3 right-0 w-[180px] bg-black border border-clash-rust px-3 py-2 z-50 text-center"
                       >
                         <div className="text-[10px] font-mono text-clash-rust uppercase tracking-wider">
-                          You need a special key...
+                          Locked : Need a special key to unlock.
                         </div>
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-4 border-transparent border-t-clash-rust" />
+                        <div className="absolute top-full right-4 -mt-[1px] border-4 border-transparent border-t-clash-rust" />
                       </motion.div>
                     )}
                   </AnimatePresence>
